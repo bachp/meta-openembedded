@@ -3,22 +3,16 @@ DESCRIPTION =  "A software framework, for scalable cross-language services devel
 HOMEPAGE = "https://thrift.apache.org/"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e4ed21f679b2aafef26eac82ab0c2cbf \
-                    file://NOTICE;md5=115f49498b66b494b0472658f2bfe80b"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=394465e125cffc0f133695ed43f14047 \
+                    file://NOTICE;md5=42748ae4646b45fbfa5182807321fb6c"
 
 DEPENDS = "thrift-native boost flex-native bison-native openssl"
 
 SRC_URI = "http://mirror.switch.ch/mirror/apache/dist/thrift/${PV}/${BPN}-${PV}.tar.gz \
-           file://0001-Forcibly-disable-check-for-Qt5.patch \
-           file://0001-THRIFT-3828-In-cmake-avoid-use-of-both-quoted-paths-.patch \
-           file://0002-THRIFT-3831-in-test-cpp-explicitly-use-signed-char.patch \
-           file://0004-THRIFT-3207-enable-build-with-OpenSSL-1.1.0-series.patch \
-           file://0005-THRIFT-3878-Compile-error-in-TSSLSocket.cpp-with-new.patch \
-           file://0006-THRIFT-3736-C++-library-build-fails-if-OpenSSL-does-.patch \
-"
+          "
 
-SRC_URI[md5sum] = "88d667a8ae870d5adeca8cb7d6795442"
-SRC_URI[sha256sum] = "b0740a070ac09adde04d43e852ce4c320564a292f26521c46b78e0641564969e"
+SRC_URI[md5sum] = "0be59730ebce071eceaf6bfdb8d3a20e"
+SRC_URI[sha256sum] = "c4ad38b6cb4a3498310d405a91fef37b9a8e79a50cd0968148ee2524d2fa60c2"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -30,6 +24,7 @@ export BUILD_SYS
 export HOST_SYS
 
 EXTRA_OECMAKE = " \
+    -DENABLE_PRECOMPILED_HEADERS=OFF \
     -DBUILD_LIBRARIES=ON \
     -DBUILD_COMPILER=ON \
     -DBUILD_TESTING=OFF \
@@ -37,17 +32,19 @@ EXTRA_OECMAKE = " \
     -DBUILD_TUTORIALS=OFF \
     -DWITH_CPP=ON \
     -DWITH_JAVA=OFF \
+    -DWITH_PYTHON=OFF \
     -DWITH_STATIC_LIB=ON \
     -DWITH_SHARED_LIB=ON \
     -DWITH_OPENSSL=ON \
     -DWITH_QT4=OFF \
     -DWITH_QT5=OFF \
+    -DWITH_BOOST_FUNCTIONAL=OFF \
 "
 
-PACKAGECONFIG ??= "libevent glib python"
-PACKAGECONFIG[libevent] = "-DWITH_LIBEVENT=ON,-DWITH_LIBEVENT=OFF,libevent,"
-PACKAGECONFIG[python] = "-DWITH_PYTHON=ON,-DWITH_PYTHON=OFF,python,"
-PACKAGECONFIG[glib] = "-DWITH_C_GLIB=ON,-DWITH_C_GLIB=OFF,glib-2.0 ,"
+PACKAGECONFIG ??= "libevent glib boost-smart-ptr"
+PACKAGECONFIG[libevent] = "-DWITH_LIBEVENT=ON,-DWITH_LIBEVENT=OFF,libevent"
+PACKAGECONFIG[glib] = "-DWITH_C_GLIB=ON,-DWITH_C_GLIB=OFF,glib-2.0"
+PACKAGECONFIG[boost-smart-ptr] = "-DWITH_BOOST_SMART_PTR=ON,-DWITH_BOOST_SMART_PTR=OFF,boost"
 
 do_install_append () {
     ln -sf thrift ${D}/${bindir}/thrift-compiler
@@ -56,8 +53,11 @@ do_install_append () {
 LEAD_SONAME = "libthrift.so.${PV}"
 
 # thrift packages
-PACKAGE_BEFORE_PN = "${PN}-compiler lib${BPN}"
-FILES_lib${BPN} = "${libdir}/*.so.*"
+PACKAGE_BEFORE_PN = "${PN}-compiler lib${BPN} lib${BPN}z lib${BPN}nb lib${BPN}-c-glib"
+FILES_lib${BPN} = "${libdir}/libthrift.so.*"
+FILES_lib${BPN}z = "${libdir}/libthriftz.so.*"
+FILES_lib${BPN}nb = "${libdir}/libthriftnb.so.*"
+FILES_lib${BPN}-c-glib = "${libdir}/libthrift_c_glib.so.*"
 FILES_${PN}-compiler = "${bindir}/*"
 
 # The thrift packages just pulls in some default dependencies but is otherwise empty
