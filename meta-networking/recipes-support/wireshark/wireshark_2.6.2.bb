@@ -59,10 +59,7 @@ EXTRA_OECMAKE += "-DENABLE_NETLINK=ON \
                   -DBUILD_randpktdump=OFF \
                   -DBUILD_androiddump=OFF \
                   -DBUILD_dcerpcidl2wrs=OFF \
-                  -DM_INCLUDE_DIR=${includedir} \
-                  -DM_LIBRARY=${libdir} \
                  "
-CFLAGS_append = " -lm"
 
 do_install_append_class-native() {
 	install -d ${D}${bindir}
